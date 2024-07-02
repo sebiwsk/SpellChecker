@@ -11,20 +11,18 @@ function loadTextFile(file, callback) {
 }
 
 function wordsArray(text) {
-    // Split text into lines
     const lines = text.split('\n');
     let words = [];
-    // Initialize array to store words
-    
-    // Iterate through each line
+
     lines.forEach(line => {
-       // Trim any leading/trailing whitespace
        line = line.trim();
- 
-       // If line is not empty, split by whitespace and add to words array
+       const tolerance = 1;
        if (line !== '') {
           const lineWords = line.split(/\s+/);
-          words = words.concat(lineWords);
+          len_lineWords = line.length;
+            if (line.length >= (len_lineWords - tolerance) && line.length <= (len_lineWords + tolerance)) {
+                words = words.concat(lineWords);
+            }
        }
     });
  
@@ -61,41 +59,65 @@ function wagner_fischer(s1, s2) {
     return current_row[len_s1];
 }
 
+function levenshteinDistance(s1, s2) {
+    const len_s1 = s1.length;
+    const len_s2 = s2.length;
+    const dp = Array.from({ length: len_s1 + 1 }, (_, i) => [i]);
+
+    for (let j = 1; j <= len_s2; j++) {
+        dp[0][j] = j;
+    }
+
+    for (let i = 1; i <= len_s1; i++) {
+        for (let j = 1; j <= len_s2; j++) {
+            const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+            dp[i] = dp[i] || [];
+            dp[i][j] = Math.min(
+                dp[i - 1][j] + 1,
+                dp[i][j - 1] + 1,
+                dp[i - 1][j - 1] + cost
+            );
+        }
+    }
+
+    return dp[len_s1][len_s2];
+}
+
 document.getElementById('form').addEventListener('submit', function(event) {
     event.preventDefault();
-
     const wordInput = document.getElementById('wordInput').value;
-
     const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = `<p>Du hast das Wort eingegeben: </p>`;
 
     const misspelled_word = wordInput;
-
     loadTextFile(txtFile, function(response) {
         const words = wordsArray(response);
         const suggestions = spell_check(misspelled_word, words);
-    
-        console.log(`Top 10 suggestions for '${misspelled_word}':`);
         const resultDiv = document.getElementById('result');
         suggestions.forEach(([word, distance]) => {
-            console.log(`${word} (Distance: ${distance})`);
+            resultDiv.innerHTML += `${word} (Abstand: ${distance})</br>`;
         });
-        resultDiv.innerHTML = `</p>`;
     });
 });
 
-const txtFile = "Words.txt"; // Replace with your actual file name
+const txtFile = "Words.txt";
 
 
 function spell_check(misspelled_word, words) {
     let suggestions = [];
     for (let i = 0; i < words.length; i++) {
         if (misspelled_word === words[i]) {
-            console.log("Das Wort wurde richtig geschrieben");
-            return []; // If the word is correctly spelled, no need for suggestions
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML += `The word was spelled correctly`;
+            return [];
         } else {
-            let distance = wagner_fischer(misspelled_word, words[i]);
-            suggestions.push([words[i], distance]);
+            if (misspelled_word.length < 10) {
+                let distance = levenshteinDistance(misspelled_word, words[i]);
+                suggestions.push([words[i], distance]);
+            }
+            else {
+                let distance = wagner_fischer(misspelled_word, words[i]);
+                suggestions.push([words[i], distance]);
+            }
         }
     }
     suggestions.sort((a, b) => a[1] - b[1]);
