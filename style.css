@@ -41,3 +41,7 @@ input:focus + .line:after {
   transition: transform 0.3s ease;
   background: #1abc9c;
 }
+
+.result {
+ margin-top: 5%;
+}
