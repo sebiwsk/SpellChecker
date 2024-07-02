@@ -67,7 +67,7 @@ document.getElementById('form').addEventListener('submit', function(event) {
     const wordInput = document.getElementById('wordInput').value;
 
     const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = `<p>Du hast das Wort eingegeben: <strong>${wordInput}</strong></p>`;
+    resultDiv.innerHTML = `<p>Du hast das Wort eingegeben: </p>`;
 
     const misspelled_word = wordInput;
 
@@ -76,9 +76,11 @@ document.getElementById('form').addEventListener('submit', function(event) {
         const suggestions = spell_check(misspelled_word, words);
     
         console.log(`Top 10 suggestions for '${misspelled_word}':`);
+        const resultDiv = document.getElementById('result');
         suggestions.forEach(([word, distance]) => {
             console.log(`${word} (Distance: ${distance})`);
         });
+        resultDiv.innerHTML = `</p>`;
     });
 });
 
