@@ -84,9 +84,12 @@ function levenshteinDistance(s1, s2) {
 }
 
 document.getElementById('form').addEventListener('submit', function(event) {
+    
     event.preventDefault();
     const wordInput = document.getElementById('wordInput').value;
     const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = "";
+
 
     const misspelled_word = wordInput;
     loadTextFile(txtFile, function(response) {
@@ -123,3 +126,4 @@ function spell_check(misspelled_word, words) {
     suggestions.sort((a, b) => a[1] - b[1]);
     return suggestions.slice(0, 10);
 }
+resultDiv.innerHTML
