@@ -61,19 +61,31 @@ function wagner_fischer(s1, s2) {
     return current_row[len_s1];
 }
 
-// Usage example
-const txtFile = "Words.txt"; // Replace with your actual file name
-const misspelled_word = "worrlds";
+document.getElementById('form').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-loadTextFile(txtFile, function(response) {
-    const words = wordsArray(response);
-    const suggestions = spell_check(misspelled_word, words);
+    const wordInput = document.getElementById('wordInput').value;
 
-    console.log(`Top 10 suggestions for '${misspelled_word}':`);
-    suggestions.forEach(([word, distance]) => {
-        console.log(`${word} (Distance: ${distance})`);
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = `<p>Du hast das Wort eingegeben: </p>`;
+
+    const misspelled_word = wordInput;
+
+    loadTextFile(txtFile, function(response) {
+        const words = wordsArray(response);
+        const suggestions = spell_check(misspelled_word, words);
+    
+        console.log(`Top 10 suggestions for '${misspelled_word}':`);
+        const resultDiv = document.getElementById('result');
+        suggestions.forEach(([word, distance]) => {
+            console.log(`${word} (Distance: ${distance})`);
+        });
+        resultDiv.innerHTML = `</p>`;
     });
 });
+
+const txtFile = "Words.txt"; // Replace with your actual file name
+
 
 function spell_check(misspelled_word, words) {
     let suggestions = [];
