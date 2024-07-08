@@ -80,24 +80,22 @@ function spell_check(misspelled_word, words) {
     let suggestions = [];
     for (let i = 0; i < words.length; i++) {
         if (misspelled_word === words[i]) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML += `The word was spelled correctly!</br>`;
-            return [];
-        } else {
-            let distance
+            return [{word: words[i], distance: 0}];
+        } 
+        else {
+            let distance;
             if (misspelled_word.length < 10) {
                 distance = levenshteinDistance(misspelled_word, words[i]);
             }
             else {
                 distance = wagner_fischer(misspelled_word, words[i]);
             }
-
             if (distance < 4) {
-                suggestions.push([words[i], distance]);
+                suggestions.push({ word: words[i], distance: distance });
             }
         }
     }
-    suggestions.sort((a, b) => a[1] - b[1]);
+    suggestions.sort((a, b) => a.distance - b.distance);
     return suggestions.slice(0, 10);
 }
 
@@ -116,10 +114,15 @@ document.getElementById('form').addEventListener('submit', function(event) {
             const words = wordsArray(response);
             const suggestions = spell_check(wordInput, words);
             const resultDiv = document.getElementById('result');
-            if (suggestions.length != 0) {
-                suggestions.forEach(([word, distance]) => {
-                    resultDiv.innerHTML += `${word} (Distance: ${distance})</br>`;
-                });
+            if (suggestions.length > 0) {
+                if (suggestions[0].distance === 0) {
+                    resultDiv.innerHTML += `The word was spelled correctly!</br>`;
+                }
+                else {
+                    suggestions.forEach(({word, distance}) => {
+                        resultDiv.innerHTML += `${word} (Distance: ${distance})</br>`;
+                    });
+                }
             }
             else {
                 resultDiv.innerHTML += `No word was found for improvement!`;
