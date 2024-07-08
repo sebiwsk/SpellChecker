@@ -16,22 +16,10 @@ function loadTextFile(file, callback) {
 }
 
 function wordsArray(text) {
-    const lines = text.split('\n');
-    let words = [];
-
-    lines.forEach(line => {
-       line = line.trim();
-       const tolerance = 1;
-       if (line !== '') {
-           const lineWords = line.split(/\s+/);
-          len_lineWords = line.length;
-            if (line.length >= (len_lineWords - tolerance) && line.length <= (len_lineWords + tolerance)) {
-                words = words.concat(lineWords);
-            }
-       }
-    });
- 
-    return words;
+    return text.split('\n')
+        .map(line => line.trim())
+        .filter(line => line !== '')
+        .flatMap(line => line.split(/\s+/));
 }
 
 function wagner_fischer(s1, s2) {
