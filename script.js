@@ -18,7 +18,7 @@ function wordsArray(text) {
        line = line.trim();
        const tolerance = 1;
        if (line !== '') {
-          const lineWords = line.split(/\s+/);
+           const lineWords = line.split(/\s+/);
           len_lineWords = line.length;
             if (line.length >= (len_lineWords - tolerance) && line.length <= (len_lineWords + tolerance)) {
                 words = words.concat(lineWords);
@@ -63,7 +63,7 @@ function levenshteinDistance(s1, s2) {
     const len_s1 = s1.length;
     const len_s2 = s2.length;
     const dp = Array.from({ length: len_s1 + 1 }, (_, i) => [i]);
-
+ 
     for (let j = 1; j <= len_s2; j++) {
         dp[0][j] = j;
     }
@@ -84,18 +84,27 @@ function levenshteinDistance(s1, s2) {
 }
 
 document.getElementById('form').addEventListener('submit', function(event) {
+    
     event.preventDefault();
     const wordInput = document.getElementById('wordInput').value;
     const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = "";
+
 
     const misspelled_word = wordInput;
     loadTextFile(txtFile, function(response) {
         const words = wordsArray(response);
         const suggestions = spell_check(misspelled_word, words);
         const resultDiv = document.getElementById('result');
-        suggestions.forEach(([word, distance]) => {
-            resultDiv.innerHTML += `${word} (Abstand: ${distance})</br>`;
-        });
+        console.log(suggestions.length);
+        if (suggestions.length != 0) {
+            suggestions.forEach(([word, distance]) => {
+                resultDiv.innerHTML += `${word} (Distance: ${distance})</br>`;
+            });
+        }
+        else {
+            resultDiv.innerHTML += `No word was found for improvement!`;
+        }  
     });
 });
 
@@ -107,15 +116,18 @@ function spell_check(misspelled_word, words) {
     for (let i = 0; i < words.length; i++) {
         if (misspelled_word === words[i]) {
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML += `The word was spelled correctly`;
+            resultDiv.innerHTML += `The word was spelled correctly!</br>`;
             return [];
         } else {
+            let distance
             if (misspelled_word.length < 10) {
-                let distance = levenshteinDistance(misspelled_word, words[i]);
-                suggestions.push([words[i], distance]);
+                distance = levenshteinDistance(misspelled_word, words[i]);
             }
             else {
-                let distance = wagner_fischer(misspelled_word, words[i]);
+                distance = wagner_fischer(misspelled_word, words[i]);
+            }
+
+            if (distance < 4) {
                 suggestions.push([words[i], distance]);
             }
         }
