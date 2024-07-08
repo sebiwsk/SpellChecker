@@ -77,7 +77,8 @@ function levenshteinDistance(s1, s2) {
 }
 
 function spell_check(misspelled_word, words) {
-    let suggestions = [];
+    const suggestions = [];
+    const maxDistance = 4;
     for (let i = 0; i < words.length; i++) {
         if (misspelled_word === words[i]) {
             return [{word: words[i], distance: 0}];
@@ -90,7 +91,7 @@ function spell_check(misspelled_word, words) {
             else {
                 distance = wagner_fischer(misspelled_word, words[i]);
             }
-            if (distance < 4) {
+            if (distance < maxDistance) {
                 suggestions.push({ word: words[i], distance: distance });
             }
         }
@@ -113,7 +114,6 @@ document.getElementById('form').addEventListener('submit', function(event) {
         else {
             const words = wordsArray(response);
             const suggestions = spell_check(wordInput, words);
-            const resultDiv = document.getElementById('result');
             if (suggestions.length > 0) {
                 if (suggestions[0].distance === 0) {
                     resultDiv.innerHTML += `The word was spelled correctly!</br>`;
