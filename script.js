@@ -3,10 +3,15 @@ function loadTextFile(file, callback) {
     rawFile.overrideMimeType("text/plain");
     rawFile.open("GET", file, true);
     rawFile.onreadystatechange = function() {
-        if (rawFile.readyState === 4 && rawFile.status == "200") {
-            callback(rawFile.responseText);
+        if (rawFile.readyState === 4) {
+            if (rawFile.status === 200) {
+                callback(null, rawFile.responseText);  
+            }
+            else {
+                callback(new Error("Error loading file: " + rawFile.status));
+            }
         }
-    }
+    };
     rawFile.send(null);
 }
 
@@ -115,18 +120,23 @@ document.getElementById('form').addEventListener('submit', function(event) {
     resultDiv.innerHTML = "";
     
     const txtFile = "Words.txt";
-    loadTextFile(txtFile, function(response) {
-        const words = wordsArray(response);
-        const suggestions = spell_check(wordInput, words);
-        const resultDiv = document.getElementById('result');
-        if (suggestions.length != 0) {
-            suggestions.forEach(([word, distance]) => {
-                resultDiv.innerHTML += `${word} (Distance: ${distance})</br>`;
-            });
+    loadTextFile(txtFile, function(error, response) {
+        if (error) {
+            resultDiv.innerHTML = "Error loading file.";
         }
         else {
-            resultDiv.innerHTML += `No word was found for improvement!`;
-        }  
+            const words = wordsArray(response);
+            const suggestions = spell_check(wordInput, words);
+            const resultDiv = document.getElementById('result');
+            if (suggestions.length != 0) {
+                suggestions.forEach(([word, distance]) => {
+                    resultDiv.innerHTML += `${word} (Distance: ${distance})</br>`;
+                });
+            }
+            else {
+                resultDiv.innerHTML += `No word was found for improvement!`;
+            }  
+        }
     });
 });
 
