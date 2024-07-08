@@ -83,34 +83,6 @@ function levenshteinDistance(s1, s2) {
     return dp[len_s1][len_s2];
 }
 
-document.getElementById('form').addEventListener('submit', function(event) {
-    
-    event.preventDefault();
-    const wordInput = document.getElementById('wordInput').value;
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = "";
-
-
-    const misspelled_word = wordInput;
-    loadTextFile(txtFile, function(response) {
-        const words = wordsArray(response);
-        const suggestions = spell_check(misspelled_word, words);
-        const resultDiv = document.getElementById('result');
-        console.log(suggestions.length);
-        if (suggestions.length != 0) {
-            suggestions.forEach(([word, distance]) => {
-                resultDiv.innerHTML += `${word} (Distance: ${distance})</br>`;
-            });
-        }
-        else {
-            resultDiv.innerHTML += `No word was found for improvement!`;
-        }  
-    });
-});
-
-const txtFile = "Words.txt";
-
-
 function spell_check(misspelled_word, words) {
     let suggestions = [];
     for (let i = 0; i < words.length; i++) {
@@ -135,3 +107,27 @@ function spell_check(misspelled_word, words) {
     suggestions.sort((a, b) => a[1] - b[1]);
     return suggestions.slice(0, 10);
 }
+
+document.getElementById('form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const wordInput = document.getElementById('wordInput').value;
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = "";
+    
+    const txtFile = "Words.txt";
+    loadTextFile(txtFile, function(response) {
+        const words = wordsArray(response);
+        const suggestions = spell_check(wordInput, words);
+        const resultDiv = document.getElementById('result');
+        if (suggestions.length != 0) {
+            suggestions.forEach(([word, distance]) => {
+                resultDiv.innerHTML += `${word} (Distance: ${distance})</br>`;
+            });
+        }
+        else {
+            resultDiv.innerHTML += `No word was found for improvement!`;
+        }  
+    });
+});
+
+
